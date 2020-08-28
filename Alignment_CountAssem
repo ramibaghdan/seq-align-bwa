@@ -1,0 +1,81 @@
+#####
+
+#Alignment of burbot fastq files to two reference genomes.
+
+
+#####
+
+#In Bash:
+
+#First, files required for the analysis are copied into the working directory in the HPC environment:
+
+#Script to run bwa alignment.
+cp -r /scratch/emandevi/genomicmethods/PS2/run_bwa_queuesub.sh /scratch/rbaghdan/genomicmethods
+
+#Gadus morhua reference genome.
+cp -r /scratch/emandevi/genomicmethods/PS2/Gadus_morhua /scratch/rbaghdan/genomicmethods
+
+#Burbot query reads.
+cp -r /scratch/emandevi/genomicmethods/PS2/burbot_fastq /scratch/rbaghdan/genomicmethods
+
+#New burbot reference genome.
+cp -r /scratch/emandevi/genomicmethods/PS2/new_burbot_genome /scratch/rbaghdan/genomicmethods
+
+#README.txt including instructions to run bwa alignment.
+cp -r /scratch/emandevi/genomicmethods/PS2/README.txt /scratch/rbaghdan/genomicmethods
+
+#Script to count assembled reads.
+cp -r /scratch/emandevi/genomicmethods/PS2/count_assembled.sh /scratch/rbaghdan/genomicmethods
+
+
+#Next, only a portion of the burbot fastq files from the burbot_fastq directory were used for alignment.
+cd burbot_fastq/
+ls
+
+#To select the small number of files, those fastq files starting with 1000 were moved to a directory 'bwa_assem'.
+
+mkdir bwa_assem
+cp burbot_fastq/1000*fq bwa_assem
+
+#Now, the directory bwa_assem contains the fastq files that are used in the alignment.
+
+ls bwa_assem | wc
+#76
+
+#There are 76 fastq sequences (demultiplexed) that will be aligned to 2 reference sequences selected. The 2 reference sequences are the complete/new Gadus morhua reference genome and the new burbot reference genome (copied to the genomicmethods directory earlier). 
+#Both these reference genomes have been indexed for bwa and bowtie2.
+#Code is executed from within the bwa_assem directory. The run_bwa_queuesub.sh and count_assembled.sh scripts were copied into the bwa_assem directory.
+
+
+#To run the alignment, run_bwa_queuesub.sh is edited to accommodate alignment to the Gadus morhua reference genome and then saved as run_bwa_queuesubGM.sh (see Appendix). 
+#The following code is run from within the bwa_assem directory.
+
+for file in 1000*.fq; do sbatch run_bwa_queuesubGM.sh $file; done
+
+#The sorted bam and bam.bai files are present in the bwa_assem2 directory (another directory within bwa_assem).
+
+#Next, the fastq sequences were aligned to the new burbot genome. 
+#run_bwa_queuesub.sh was edited to accommodate alignment and then saved as run_bwa_queuesubNBG.sh. 
+#The following code was run from within the bwa_assem directory as well.
+
+for file in 1000*.fq; do sbatch run_bwa_queuesubNBG.sh $file; done
+
+#The sorted bam and bam.bai files are present in the bwa_assem3 directory (also within the bwa_assem directory)
+
+#Next, to count the assembled reads, the count_assembled.sh script is modified for each of the two alignments (see Appendix). 
+#The following commands count the assembled reads for both alignments.
+
+#For the Gadus Morhua alignment,
+
+sbatch count_assembledGM.sh
+
+#For the new burbot genome alignment,
+
+sbatch count_assembledNBG.sh
+
+#The outputs are stored in the assembled_per_indGM.txt file (Gadus morhua) and in the assembled_per_indNBG.txt file (new burbot genome).
+
+#To run analyses on the counts in R, the files must be exported from the HPC environment (graham) to the local computer environment. This is done using the following commands from the local environment.
+
+scp rbaghdan@graham.computecanada.ca:/scratch/rbaghdan/genomicmethods/bwa_assem/assembled_per_indGM.txt ~/Desktop/genomicmeth
+scp rbaghdan@graham.computecanada.ca:/scratch/rbaghdan/genomicmethods/bwa_assem/assembled_per_indNBG.txt ~/Desktop/genomicmeth
