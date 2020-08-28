@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-## Compare percentage of reads assembled and quantify variation among individuals.
+## This script compares the percentage of reads assembled and quantifies variation among individual alignment rates.
 
 ```{r}
 
