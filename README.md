@@ -1,4 +1,4 @@
-#Sequence alignment using bwa.
+# Sequence alignment using bwa.
 
 In this analysis, sequence data (100 bp reads from the freshwater burbot fish) attained from Illumina HiSeq 2500 is aligned to different reference genomes using bwa to compare alignment rates. The two reference genomes used are the highly fragmented burbot genome in the NCBI database (with a low N50) and a well-developed cod genome (closely related to burbot). The sequence reads from freshwater burbot fish are aligned to both the Gadus morhua complete genome and the new burbot genome to observe variation in alignment rates between individuals and references.
 
